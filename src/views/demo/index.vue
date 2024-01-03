@@ -1,75 +1,47 @@
 <script setup lang="ts" name="Demo">
-import {reactive, ref} from "vue";
+import {ref} from "vue";
 import axios from "axios";
 import type {Food} from "@/api/food/types";
+
+const value = ref('');
+
+const onSearch = (name: string) => {
+  getFoods(name)
+};
+
+const onCancel = () => {
+  console.log('cancel');
+};
 
 
 const foodsRef = ref<Food[]>([])
 
-axios.get('/food/page')
-    .then(resp => {
-      console.log(resp);
-      let foods: Food[] = resp.data.data;
-      foodsRef.value = foods;
-      console.log(foodsRef.value);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+// 根据菜品名搜索菜品
+const getFoods = async (name: string) => {
+  const {data} = await axios.get('/food/page', {
+    params: {
+      name,
+    }
+  })
+  foodsRef.value = data.data;
+}
 
-const contentList = reactive([
-  "✔ ⚡ Vue3 + Vite4",
-  "✔ 🍕 TypeScript",
-  "✔ ✨ Vant4 组件库",
-  "✔ 🌀 Tailwindcss 原子类框架",
-  "✔ 🍍 Pinia 状态管理",
-  "✔ 🌓 支持深色模式",
-  "✔ Vue-router 4",
-  "✔ 支持 SVG 图标自动注册组件",
-  "✔ vw 视口适配",
-  "✔ Axios 封装",
-  "✔ 打包资源 gzip 压缩",
-  "✔ 开发环境支持 Mock 数据",
-  "✔ ESLint",
-  "✔ 首屏加载动画",
-  "✔ 开发环境调试面板"
-]);
+getFoods('');
 </script>
 
 <template>
-  <div class="demo-content px-[12px]">
-    <img
-      class="block w-[120px] mx-auto mb-[20px] pt-[30px]"
-      alt="Vue logo"
-      src="~@/assets/logo_melomini.png"
+  <form action="/">
+    <van-search
+        v-model="value"
+        show-action
+        placeholder="请输入搜索关键词"
+        @search="onSearch"
+        @cancel="onCancel"
     />
-    <div class="pl-[12px] border-l-[3px] border-[color:#41b883]">
-      <a
-        class="flex items-center"
-        href="https://github.com/yulimchen/vue3-h5-template"
-        target="_blank"
-      >
-        <svg-icon class="text-[20px] mr-[8px]" name="github" />
-        <h3 class="font-bold text-[18px] my-[4px]">Vue3-h5-template</h3>
-        <svg-icon class="text-[12px] ml-[5px]" name="link" />
-      </a>
-    </div>
-    <div
-      class="text-[14px] py-[2px] px-[10px] rounded-[4px] bg-[var(--color-block-background)] mt-[14px]"
-    >
-      <p class="my-[14px] leading-[24px]">
-        🌱 基于 Vue3 全家桶、TypeScript、Vite 构建工具，开箱即用的 H5
-        移动端项目基础模板
-      </p>
-    </div>
+  </form>
 
-    <div>
-      <h2>Menu List</h2>
-      <ul>
-        <li v-for="menuItem in foodsRef" :key="menuItem.id">
-          {{ menuItem.name }}
-        </li>
-      </ul>
-    </div>
-  </div>
+  <van-grid :column-num="2">
+    <van-grid-item v-for="menuItem in foodsRef" :key="menuItem.id" icon="photo-o" :text="menuItem.name" />
+  </van-grid>
+
 </template>
