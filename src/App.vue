@@ -1,12 +1,5 @@
-<script setup lang="ts">
-import CookMenu from './components/CookMenu.vue';
-
-</script>
-
 <template>
-  <CookMenu/>
+  <router-view />
 </template>
 
-<style scoped>
-
-</style>
+<style></style>
